@@ -1,10 +1,11 @@
+// Selecting DOM elements
 let noteForm;
 let noteTitle;
 let noteText;
 let saveNoteBtn;
 let newNoteBtn;
 let noteList;
-let clearBtn; // Added clearBtn declaration
+let clearBtn;
 
 if (window.location.pathname === '/notes') {
   noteForm = document.querySelector('.note-form');
@@ -16,37 +17,33 @@ if (window.location.pathname === '/notes') {
   noteList = document.querySelectorAll('.list-container .list-group');
 }
 
-// Show an element
+// Helper functions to show and hide elements
 const show = (elem) => {
   elem.style.display = 'inline';
 };
 
-// Hide an element
 const hide = (elem) => {
   elem.style.display = 'none';
 };
 
-// activeNote is used to keep track of the note in the textarea
+// Object to track the active note
 let activeNote = {};
 
+// Fetch notes from the server
 const getNotes = () =>
-  fetch('/api/notes', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    return response.json();
-  })
-  .catch(error => {
-    console.error('Error fetching notes:', error);
-    throw error; // Re-throw the error to propagate it further if needed
-  });
+  fetch('/api/notes')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .catch(error => {
+      console.error('Error fetching notes:', error);
+      throw error;
+    });
 
+// Save a new note to the server
 const saveNote = (note) =>
   fetch('/api/notes', {
     method: 'POST',
@@ -66,6 +63,7 @@ const saveNote = (note) =>
     throw error;
   });
 
+// Delete a note from the server
 const deleteNote = (id) =>
   fetch(`/api/notes/${id}`, {
     method: 'DELETE',
@@ -110,18 +108,19 @@ const handleNoteSave = () => {
     title: noteTitle.value,
     text: noteText.value
   };
-  saveNote(newNote).then(() => {
-    getAndRenderNotes();
-    renderActiveNote();
-  }).catch(error => {
-    console.error('Error handling note save:', error);
-    // Optionally handle or display the error to the user
-  });
+  saveNote(newNote)
+    .then(() => {
+      getAndRenderNotes();
+      renderActiveNote();
+    })
+    .catch(error => {
+      console.error('Error handling note save:', error);
+      // Optionally handle or display the error to the user
+    });
 };
 
 // Handle deleting a note
 const handleNoteDelete = (e) => {
-  // Prevents the click listener for the list from being called when the button inside of it is clicked
   e.stopPropagation();
 
   const note = e.target;
@@ -131,13 +130,15 @@ const handleNoteDelete = (e) => {
     activeNote = {};
   }
 
-  deleteNote(noteId).then(() => {
-    getAndRenderNotes();
-    renderActiveNote();
-  }).catch(error => {
-    console.error('Error handling note delete:', error);
-    // Optionally handle or display the error to the user
-  });
+  deleteNote(noteId)
+    .then(() => {
+      getAndRenderNotes();
+      renderActiveNote();
+    })
+    .catch(error => {
+      console.error('Error handling note delete:', error);
+      // Optionally handle or display the error to the user
+    });
 };
 
 // Handle viewing a note
@@ -154,7 +155,7 @@ const handleNewNoteView = (e) => {
   renderActiveNote();
 };
 
-// Render buttons based on form state
+// Render save and clear buttons based on form state
 const handleRenderBtns = () => {
   show(clearBtn);
   if (!noteTitle.value.trim() && !noteText.value.trim()) {
@@ -166,7 +167,7 @@ const handleRenderBtns = () => {
   }
 };
 
-// Render the list of notes
+// Render the list of notes from JSON data
 const renderNoteList = async (jsonNotes) => {
   if (window.location.pathname === '/notes') {
     noteList.forEach((el) => (el.innerHTML = ''));
@@ -174,7 +175,6 @@ const renderNoteList = async (jsonNotes) => {
 
   let noteListItems = [];
 
-  // Create list item for each note
   const createLi = (text, delBtn = true) => {
     const liEl = document.createElement('li');
     liEl.classList.add('list-group-item');
@@ -203,7 +203,6 @@ const renderNoteList = async (jsonNotes) => {
     return liEl;
   };
 
-  // Display message if no notes are available
   if (!jsonNotes || jsonNotes.length === 0) {
     noteListItems.push(createLi('No saved Notes', false));
   } else {
@@ -219,7 +218,7 @@ const renderNoteList = async (jsonNotes) => {
   }
 };
 
-// Fetch and render notes
+// Fetch and render notes from the server
 const getAndRenderNotes = () => {
   getNotes()
     .then((jsonNotes) => {
@@ -231,7 +230,7 @@ const getAndRenderNotes = () => {
     });
 };
 
-// Event listeners
+// Event listeners for form and buttons
 if (window.location.pathname === '/notes') {
   saveNoteBtn.addEventListener('click', handleNoteSave);
   newNoteBtn.addEventListener('click', handleNewNoteView);
@@ -239,5 +238,5 @@ if (window.location.pathname === '/notes') {
   noteForm.addEventListener('input', handleRenderBtns);
 }
 
-// Initial fetch and render
+// Initial fetch and render of notes
 getAndRenderNotes();

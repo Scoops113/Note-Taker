@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const notesRouter = require('./routes/notes'); // Import the notes router
+const notesRouter = require('./routes/notes'); // Ensure this path is correct
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,7 +31,7 @@ app.post('/api/notes', (req, res) => {
       return;
     }
     const notes = JSON.parse(data);
-    newNote.id = generateUniqueId(); // Implement a function to generate unique IDs
+    newNote.id = generateUniqueId(); // Ensure this function is correctly implemented
     notes.push(newNote);
     fs.writeFile(path.join(__dirname, 'db', 'db.json'), JSON.stringify(notes), (err) => {
       if (err) {
@@ -63,7 +63,7 @@ app.delete('/api/notes/:id', (req, res) => {
 });
 
 // HTML Routes
-app.use('/', notesRouter); // Use the notes router
+app.use('/', notesRouter); // Ensure correct usage of the notes router
 
 // Catch-all route to serve index.html for any undefined routes
 app.get('*', (req, res) => {

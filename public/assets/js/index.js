@@ -3,6 +3,7 @@ let noteTitle;
 let noteText;
 let saveNoteBtn;
 let newNoteBtn;
+let clearBtn;
 let noteList;
 
 if (window.location.pathname === '/notes') {
@@ -208,12 +209,15 @@ const getAndRenderNotes = () => {
     });
 };
 
-
 if (window.location.pathname === '/notes') {
   saveNoteBtn.addEventListener('click', handleNoteSave);
   newNoteBtn.addEventListener('click', handleNewNoteView);
   clearBtn.addEventListener('click', renderActiveNote);
   noteForm.addEventListener('input', handleRenderBtns);
+
+  
+  noteTitle.id = 'note-title'; 
+  noteText.id = 'note-text'; 
 }
 
 getAndRenderNotes();

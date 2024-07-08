@@ -34,6 +34,11 @@ const getNotes = () =>
     headers: {
       'Content-Type': 'application/json'
     }
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
   });
 
 const saveNote = (note) =>
@@ -43,6 +48,11 @@ const saveNote = (note) =>
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(note)
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
   });
 
 const deleteNote = (id) =>
@@ -51,7 +61,14 @@ const deleteNote = (id) =>
     headers: {
       'Content-Type': 'application/json'
     }
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
   });
+
+// Other functions remain unchanged
 
 const renderActiveNote = () => {
   hide(saveNoteBtn);
@@ -128,8 +145,7 @@ const handleRenderBtns = () => {
 };
 
 // Render the list of note titles
-const renderNoteList = async (notes) => {
-  let jsonNotes = await notes.json();
+const renderNoteList = async (jsonNotes) => {
   if (window.location.pathname === '/notes') {
     noteList.forEach((el) => (el.innerHTML = ''));
   }
@@ -182,7 +198,16 @@ const renderNoteList = async (notes) => {
 };
 
 // Gets notes from the db and renders them to the sidebar
-const getAndRenderNotes = () => getNotes().then(renderNoteList);
+const getAndRenderNotes = () => {
+  getNotes()
+    .then((jsonNotes) => {
+      renderNoteList(jsonNotes); 
+    })
+    .catch((error) => {
+      console.error('Error fetching notes:', error);
+    });
+};
+
 
 if (window.location.pathname === '/notes') {
   saveNoteBtn.addEventListener('click', handleNoteSave);
